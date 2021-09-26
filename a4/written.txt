@@ -1,0 +1,59 @@
+Part 2.
+    h. 
+        Corpus BLEU: 11.777613165965748
+    g. 
+        By using 'enc_masks', we mask out the 'pad' tokens by giving pad's attention scores to be infinity negative. After going through the softmax activation, those scores get to be approximate 0 in the attention distributions, eventually, cancel out all the encoder hidden states of the pad tokens when computing the attention outputs, which makes the computation of the entire process faster.
+
+    Why it is nessesary to use the masks:
+        The attention works by focusing on some particular subwords in the input sentence that contribute to the meaning of the current target word. The pad's hidden states, which contributes nothing to the the target word, only give noise to the attention output and eventually reduce the accuracy of the prediction if they are not canceled out. 
+        
+    i. 
+        i. dot product attention --- multiplicative attention
+            Advantage: less expensive to compute (in multiplicative attention, we have to compute the extra W.dot(h_i) for each e_t_i)
+            Disadvantage: requires the encoder and decoder hidden states vectors to have same lengths
+
+        ii. additive attention --- multiplicative attention
+            Advantage: the extra weight matrices W1, W2 and the weight vector v make the architecture more complex and give the model more capability to capture the relationship betwwen encoder hidden state h_i and the decoder hidden state s_t
+            Disadvantage: more expensive to compute (an extra matrix multiplication W2.dot(s_t), a vector-element-wise addition and a vector-element-wise tanh function for each e_t_i)
+
+Part 2.
+    a. According to Wikipedia, 'In linguistic typology, polysynthetic languages are highly synthetic languages, i.e. languages in which words are composed of many morphemes (word parts that have independent meaning but may or may not be able to stand alone). They are very highly inflected languages. Polysynthetic languages typically have long "sentence-words" such as the Yupik word tuntussuqatarniksaitengqiggtuq which means "He had not yet said again that he was going to hunt reindeer."' The first problem with embedding whole word-level is that each word is structured by a combination of subwords, and some words represent very complex meanings, which makes total number of words in the vocabulary so large and expensive to encode at word-level. The second reason it is not a good idea to encond at word-level is that it make the attention machenism to be less effective due to the complex meaning in each word so the nework has the difficulty in capturing which parts of the sentence in the source language corresponde to the meaning of the current word in the target language
+
+    b. Each word is structured by a combination of subwords or characters, which makes the total number of words much more larger than the total amount of subwords or characters . So, character-level and subword embeddings are often smaller than whole word embeddings.
+
+    c. 
+    d.
+        i. Error: The underlined part in the mnt translation should be replaced with 'a crown of daises'. One possiple problem might come from the attention machenism. In this case, for the underlined part, the model might focus on the subwords with the meaning of 'her hair' in the source sentence. Another possible problem might come from the greedy algorithm of the decoder as a language model: at each step, it predict the word with the highest predicted probability and therefore the final prediction is not necessary be the sequence with the highest probability.
+            Solution: To improve the attention machenism, we could use more complex attention with higher capability to focus on the right part of the sentence, like multiplicative attention or additive attention, or we could increase the size of the hidden stages. To address the problem with greedy search, we could use beam search to peak more potential translation at each step.
+
+        ii. Error: The model cannot distinguish between 'she' and 'it', which could possibly be represented by the same subword in the source language. The problem in this case is partly due to the language structure and also the lack of context in the sentence which makes it more difficult to choose the right translation.
+            Solution: To be able to choose the right translation if the original word represent multiple meaning, one possible idea is to feed the model more data that contains the word in different meanings. Using LSTM or any RNN that reduces the long-term dependency to be better at capturing the context or increasing the size of the hidden stages are also the possible solutions.
+
+        iii. Error: The model translate the word to the correct meaning but it does not know it should be interpreted as a name. There migth be some part of the source sentence that let us know to interpret a word as a name or just a regular noun, which could be spot by attention. However,  in the preprocessing step, we uncapitalize all words in the target language and treat both captitalized and uncapitalized words as the same, so the model is not capable of iterpreting names with captitalized characters.
+            Solution: We could have a classifier at the last step to classife whether the current word is a name and should be capitilized or not. The task is performed simitaniously with the step of outputing the probability for each word.
+
+    e.
+        i. Line 307: 
+        Reference translation: "“I don’t want to die!”"
+        NMT translation: "“I don’t want to die!” screamed Wilbur, throwing himself to the ground."
+
+        This means that the encoder is able to learn the word distribution in the training data.
+
+        ii. Line 271
+        Reference translation: "And Jesus lifted up his eyes, and saw a great multitude unto him, he saith unto Philip, Where is my bread."
+        NMT translation: "Jesus therefore lifting up his eyes, and seeing that a great multitude cometh unto him, saith unto Philip, Whence are we to buy bread, that these may eat?"
+
+        This may be a sign of overfitting the input data of the decoder. Because it correctly translates only a small part of a sentence, which could be the same sequence in the train data. Indeed, in this case, the phrase "Jesus lifted up eyes" is contained in the train_en file.
+    
+    f. 
+        i. According to BLEU, c2 is better than c1 because BLEU(c2) > BLEU(c1). This result makes sense as we can see apperantly c2 is a good translation in this case while c1 is a bit less meaningful.
+        ii. In case r1 is the only reference translation, BLEU(c1) > BLEU(c2). However, as pointed out in i., c2 is still better than c1. Reducing the number of reference translation makes BLEU smaller on average and may lead to a worse result since the lack of diversity in referenced words cannot capture all the possible other (good) translations.
+        iii. With only a single reference translation, the evaluation is more biased by that reference. In other words, the reference is not capable to recognize all the other good transaltions due to its lack of "synonyms" for each n-gram. More specificly, the same words (2-grams) in the references matches account for adequacy, while the longer n-gram matches account for fluency. At a result, BLEU will not score for some good translations and will score for some bad translations which match some of its reference's n-grams.
+        iv. Advantages:
+            - Less expensive
+            - Quick (it takes weeks or moths for human)
+            - Language-independent
+            
+            Disavantages:
+            - Reasonable amount of professional reference transations must be collected
+            - There is no gruarantee that an increase in BLEU is an idicator of improved translation quality. 

@@ -1,0 +1,12 @@
+__pycache__/
+.ipynb_checkpoints/
+__MACOSX/
+*.vim
+*.swp
+*.swo
+*.pt
+l7.pdf
+l8.pdf
+l9.pdf
+derivatives.pdf
+Computing\ Neural\ Network\ Gradients.pdf
