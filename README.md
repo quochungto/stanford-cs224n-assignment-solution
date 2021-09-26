@@ -2,7 +2,7 @@
 
 This repository contains my solution (programming part) for the course CS224n Natural Language Processing (Winter 2019) offered by Stanford University. 
 - The deep learning framework used for the assignment is PyTorch. 
-- I started the course on Jan 3rd 2021 and finished it on Feb 23rd 2021.
+- I started the course on Jan 30th 2021 and completed up to assignment 4 on Mar 3rd 2021 (assignment 5 is not completed yet).
 
 **Assignment contents**
 - Assignment 1. Introduction to word vectors
